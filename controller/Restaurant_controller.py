@@ -1,8 +1,8 @@
 import requests
 import os
-from nylas import APIClient
-from config.nylas_configs import client
-from config.yelp_configs import url, headers 
+from nylas import Client
+from controller.config.nylas_configs import client
+from controller.config.yelp_configs import url, headers 
 
 parameters = {
     'location': 'US',
@@ -11,14 +11,24 @@ parameters = {
     'limit': 20
 }
 
-def get_restaurants(param,key):
-    parameters[key]=param
+def get_restaurants_helper(param,key):
+    # print(param, key)
+    if param!='':
+        parameters[key]=param
     response = requests.get(url, params=parameters, headers=headers)
     if response.status_code == 200:
         data = response.json()
         return data['businesses']
     else:
         raise Exception("ERROR in status code")
+
+def get_restaurants(params):
+    key=['location','categories','price']
+    restaurant_list = []
+    for i in range(3):
+        restaurant_list=get_restaurants_helper(params.get(key[i]), key[i])
+    return restaurant_list
+
 
 def prepare_email_content(restaurants):
     email_content = "Here are your restaurant recommendations:\n\n"
@@ -63,14 +73,11 @@ def main():
     print("Welcome to the Restaurant Finder Chatbot!")
     location = input("Please enter the city/state where you want to find restaurants: ")
     restaurants= requests.get(url, params=parameters, headers=headers).json()
-    if location != '':
-        restaurants= get_restaurants(location,'location')
+    restaurants= get_restaurants_helper(location,'location')
     alias= input("Please enter the type of food you want (ex. vegan, seafood, japanese): ")
-    if alias != '':
-        restaurants= get_restaurants(alias,'categories')
+    restaurants= get_restaurants_helper(alias,'categories')
     price= input("Please enter the pricing level you want (type 1=$, 2=$$, 3=$$$, 4=$$$$): ")
-    if price != '':
-        restaurants= get_restaurants(price,'price')
+    restaurants= get_restaurants_helper(price,'price')
     for idx, restaurant in enumerate(restaurants, 1):
         if restaurant.get('price') != None: 
             print(f"{idx}. {restaurant['name']}: {restaurant['location']['display_address']}\n \

@@ -48,4 +48,4 @@ class UserChoice(db.Model):
         return cls.query.filter_by(username=username).join(Restaurant).order_by(cls.picked_at.desc()).all()
 
 # Create the tables in the database
-db.create_all()
+# db.create_all()

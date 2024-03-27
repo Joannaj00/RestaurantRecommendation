@@ -3,6 +3,8 @@ from model.database import db
 
 def user_signup(username):
     print("hi")
+    print(username)
+    print(type(username))
     if Users.find_by_username(username)==0:
         user= Users(username)
         db.session.add(user)
@@ -11,3 +13,5 @@ def user_signup(username):
         return ""
     else:
         return "Username taken"
+
+    return ""

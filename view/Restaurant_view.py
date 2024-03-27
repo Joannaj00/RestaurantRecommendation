@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 # from model.database import db
 from controller.Restaurant_controller import get_restaurants, get_restaurants_helper
+from model.UserChoice_model import UserChoice, db
 # from model.UserChoice import UserChoice
 
 def map_restaurant_json():
@@ -17,8 +18,11 @@ def map_restaurant_json():
         # 500 is a server error
         return jsonify({'error': str(e)}), 500 
 
-# need a login, when a user joins, we need to know which user is which 
-# section saying what is the name or user id 
+def add_favorite_view():
+    username = request.json.get('username')
+    restaurant_id = request.json.get('restaurant_id')
+
+
 
 
 # def get_favorite_view(user_id):

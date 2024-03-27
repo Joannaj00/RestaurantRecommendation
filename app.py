@@ -11,7 +11,7 @@ app = Flask(__name__)
 # # Allow CORS for all domains on all routes
 # CORS(app, resources={r"/*": {"origins": "*"}})  # Adjusted to explicitly allow all origins
 
-# socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 ### CORS section
 @app.after_request
@@ -74,6 +74,9 @@ def hello():
 
 # control c to exit
 if __name__=="__main__":
+    CORS(app)
+
     with app.app_context():
         db.create_all()
+    socketio.run(app, port=5002)
     app.run(port=5000)

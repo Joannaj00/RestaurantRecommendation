@@ -3,36 +3,37 @@ from model.database import db
 import view.Restaurant_view as Restaurant_view
 import view.Users_view as Users_view
 from flask_migrate import Migrate
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 from flask_socketio import SocketIO
 
 app = Flask(__name__)
+CORS(app)
 
 # # Allow CORS for all domains on all routes
 # CORS(app, resources={r"/*": {"origins": "*"}})  # Adjusted to explicitly allow all origins
 
 # socketio = SocketIO(app, cors_allowed_origins="*")
 
-### CORS section
-@app.after_request
-def after_request_func(response):
-    origin = request.headers.get('Origin')
-    if request.method == 'OPTIONS':
-        response = make_response()
-        response.headers.add('Access-Control-Allow-Credentials', 'true')
-        response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
-        response.headers.add('Access-Control-Allow-Headers', 'x-csrf-token')
-        response.headers.add('Access-Control-Allow-Methods',
-                            'GET, POST, OPTIONS, PUT, PATCH, DELETE')
-        if origin:
-            response.headers.add('Access-Control-Allow-Origin', origin)
-    else:
-        response.headers.add('Access-Control-Allow-Credentials', 'true')
-        if origin:
-            response.headers.add('Access-Control-Allow-Origin', origin)
-
-    return response
-### end CORS section
+## CORS section
+# @app.after_request
+# def after_request_func(response):
+#     origin = request.headers.get('Origin')
+#     if request.method == 'OPTIONS':
+#         # response = make_response()
+#         response.headers.add('Access-Control-Allow-Credentials', 'true')
+#         response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+#         response.headers.add('Access-Control-Allow-Headers', 'x-csrf-token')
+#         response.headers.add('Access-Control-Allow-Methods',
+#                             'GET, POST, OPTIONS, PUT, PATCH, DELETE')
+#         if origin:
+#             response.headers.add('Access-Control-Allow-Origin', origin)
+#     else:
+#         response.headers.add('Access-Control-Allow-Credentials', 'true')
+#         if origin:
+#             response.headers.add('Access-Control-Allow-Origin', origin)
+#     print("response created")
+#     return response
+## end CORS section
 
 # Configure the SQLAlchemy part of the app instance
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///restaurants.db'
@@ -49,6 +50,7 @@ def get_restaurants():
     return Restaurant_view.map_restaurant_json()
 
 @app.route('/login',methods=['POST',"OPTION"])
+@cross_origin()
 def get_login():
     print("App.py")
     return Users_view.signup()
@@ -76,4 +78,5 @@ def hello():
 if __name__=="__main__":
     with app.app_context():
         db.create_all()
-    app.run(port=5000)
+    socketio.run(app, port=5002)
+    # app.run(port=5000)
